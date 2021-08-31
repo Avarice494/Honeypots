@@ -35,4 +35,6 @@ class mysqlProtocol(BaseProtocol):
         data = binascii.a2b_hex(server_proto.get('mysql').get('response'))
         error = server_proto.get('mysql').get('errinfo').format(username=self.username,remote_addr=self.remote_addr).encode()
         lenstr = binascii.a2b_hex(hex( len(data)+ len(error) - 3)[2:])
-        return lenstr + data + error
+        return lenstr + data + error'm['
+
+
