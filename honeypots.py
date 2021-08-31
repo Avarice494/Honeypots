@@ -1,7 +1,7 @@
 import asyncio
 from core.proto.telnet import telnetProtocol
 from core.proto.mysql import mysqlProtocol
-
+from core.proto.mssql import mssqlProtocol
 
 # 启动服务器 #
 try:
@@ -16,11 +16,21 @@ try:
 
         allroco_tasks.append(run_service(mysqlProtocol, 3306))
         allroco_tasks.append(run_service(telnetProtocol, 23))
-
+        allroco_tasks.append(run_service(mssqlProtocol, 1433))
+        # allroco_tasks.append(loop.create_server(telnetProtocol, 21))
+        #
         await asyncio.gather(*allroco_tasks)
 
     asyncio.run(main())
 
+    # async def main():
+    #     loop = asyncio.get_running_loop()
+    #
+    #     server = await loop.create_server(lambda: mssql(), '192.168.231.110', 1433)
+    #     async with server:
+    #         await server.serve_forever()
+    #
+    # asyncio.run(main())
 except:
     # old version
     loop = asyncio.get_event_loop()
@@ -28,6 +38,8 @@ except:
 
     allroco_tasks.append(loop.create_server(mysqlProtocol, "0.0.0.0", 3306))
     allroco_tasks.append(loop.create_server(telnetProtocol, "0.0.0.0", 23))
+    allroco_tasks.append(loop.create_server(mssqlProtocol, "0.0.0.0", 1433))
+    # allroco_tasks.append(loop.create_server(telnetProtocol, "0.0.0.0", 21))
 
     server = loop.run_until_complete(asyncio.gather(*allroco_tasks))
     loop.run_forever()
