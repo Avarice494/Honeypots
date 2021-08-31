@@ -18,3 +18,5 @@ mssql::[2021-08-31 14:42:07]::qwewqeqe::ergteartertet::[DESKTOP-3MV9KRM]::192.16
 mssql::[2021-08-31 14:42:11]::qwewqeqe::ergteartertet::[DESKTOP-3MV9KRM]::192.168.231.110(局域网_对方和您在同一内部网)
 mssql::[2021-08-31 14:43:02]::qwewqeqe::ergteartertet::[DESKTOP-3MV9KRM]::192.168.231.110(局域网_对方和您在同一内部网)
 mssql::[2021-08-31 14:45:13]::qwewqeqe::ergteartertet::[DESKTOP-3MV9KRM]::192.168.231.110(局域网_对方和您在同一内部网)
+mysql::[2021-08-31 14:55:25]::root::c986a50cd800926ebcfdf67159bc31e457c6ed16::127.0.0.1(本机地址_CZ88.NET)
+mysql::[2021-08-31 14:57:14]::root::c986a50cd800926ebcfdf67159bc31e457c6ed16::127.0.0.1(本机地址_CZ88.NET)
