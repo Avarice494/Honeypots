@@ -1,7 +1,5 @@
 # 这是一个示例 Python 脚本。
-import asyncio
 import binascii
-import time
 from .baseserver import BaseProtocol
 
 ##########################全局变量###########################
@@ -13,7 +11,7 @@ dic={
     "mysql_banner":""
 }
 ############################mssql###########################
-class mssql(BaseProtocol):
+class mssqlProtocol(BaseProtocol):
     def __init__(self, protocol='mssql', have_banner=True ,logfile = authfile):
         self.protocol = protocol
         self.have_banner = have_banner
