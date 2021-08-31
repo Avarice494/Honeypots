@@ -1,12 +1,11 @@
 # 这是一个示例 Python 脚本。
+import asyncio
 import binascii
-from config import authfile
-from ..util.qqwry import get_ip_info
-from ..util.getnowtime import get_now_str
+import time
 from .baseserver import BaseProtocol
 
 ##########################全局变量###########################
-
+authfile = open('miguanlog.txt', 'a')
 dic={
     "mssql_banner":"0401002b0000010000001a00060100200001020021000103002200000400220001ff0a3206510000020000",
     "mssql_response":"0401005600370100aa420018480000010e1b004c006f00670069006e0020006600610069006c0065006400200066006f00720020007500730065007200200027007300610027002e0000000000fd0200000000000000",
@@ -14,24 +13,18 @@ dic={
     "mysql_banner":""
 }
 ############################mssql###########################
-class mssqlProtocol(BaseProtocol):
+class mssql(BaseProtocol):
     def __init__(self, protocol='mssql', have_banner=True ,logfile = authfile):
         self.protocol = protocol
         self.have_banner = have_banner
         self.username = ''
-        self.password = ''
+        self.passhash = ''
         self.remote_addr = ''
         self.remote_port = 0
         self.dic={}
-        self.clientname=''
         self.begin_tds_login_packet=[]
         self.logfile_obj = logfile
         self.have_data=False
-    def _save_pwd(self):
-        queryip, country, area = get_ip_info(self.remote_addr)
-        data = f'{self.protocol}::{get_now_str()}::{self.username}::{self.password}::[{self.clientname}]::{queryip}({country.strip()}_{area.strip()})\n'
-        self.logfile_obj.write(data)
-        self.logfile_obj.flush()
 
     def connection_made(self, transport):
         self.transport = transport
@@ -46,10 +39,8 @@ class mssqlProtocol(BaseProtocol):
         if len(data)>150:
             self._parser_data(data)
             self._get_bytes_by_flag(data)
-            print(self.dic)
             self._get_username(self.dic["Usernameoffset"],self.dic["Usernamelength"])
             self._get_passwdhash(self.dic["Passwordoffset"], self.dic["Passwordlength"])
-            self._get_clientname(self.dic["ClientNameoffset"], self.dic["ClientNamelength"])
             self.transport.write(self._get_response())
 
     def _get_banner(self):
@@ -69,17 +60,10 @@ class mssqlProtocol(BaseProtocol):
         pass
 
     def _get_username(self, of, len):
-        str = ""
-        for i in range(0, len):
-            str += chr(self.begin_tds_login_packet[of + i * 2])
-        self.username = str
-
-
-    def _get_clientname(self, of, len):
         sstr = ""
         for i in range(0, len):
             sstr += chr(self.begin_tds_login_packet[of + i * 2])
-        self.clientname = sstr
+        self.username = sstr
 
     def _get_passwdhash(self, of, len):
         pws = ""
@@ -99,7 +83,7 @@ class mssqlProtocol(BaseProtocol):
                 if passwd == sstr:
                     pws += j
                     break
-        self.password= pws
+        self.passhash = pws
 
     def _get_bytes_by_flag(self , data):
         begin = data
@@ -132,6 +116,4 @@ class mssqlProtocol(BaseProtocol):
                 'DatabaseNameoffset': LengthsAndoffset[32],
                 'DatabaseNamelength': LengthsAndoffset[34]
             }
-        #多版本兼容
-        # elif(Type == 16):
 
