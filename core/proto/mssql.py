@@ -1,9 +1,10 @@
 # 这是一个示例 Python 脚本。
 import binascii
 from .baseserver import BaseProtocol
-
+from ..util.qqwry import get_ip_info
+from ..util.getnowtime import get_now_str
+from config import authfile
 ##########################全局变量###########################
-authfile = open('miguanlog.txt', 'a')
 dic={
     "mssql_banner":"0401002b0000010000001a00060100200001020021000103002200000400220001ff0a3206510000020000",
     "mssql_response":"0401005600370100aa420018480000010e1b004c006f00670069006e0020006600610069006c0065006400200066006f00720020007500730065007200200027007300610027002e0000000000fd0200000000000000",
@@ -16,7 +17,7 @@ class mssqlProtocol(BaseProtocol):
         self.protocol = protocol
         self.have_banner = have_banner
         self.username = ''
-        self.passhash = ''
+        self.password= ''
         self.remote_addr = ''
         self.remote_port = 0
         self.dic={}
@@ -38,8 +39,14 @@ class mssqlProtocol(BaseProtocol):
             self._parser_data(data)
             self._get_bytes_by_flag(data)
             self._get_username(self.dic["Usernameoffset"],self.dic["Usernamelength"])
-            self._get_passwdhash(self.dic["Passwordoffset"], self.dic["Passwordlength"])
+            self._get_passwd(self.dic["Passwordoffset"], self.dic["Passwordlength"])
             self.transport.write(self._get_response())
+
+    def _save_pwd(self):
+        queryip, country, area = get_ip_info(self.remote_addr)
+        data = f'{self.protocol}::{get_now_str()}::{self.username}::{self.password}::{queryip}({country.strip()}_{area.strip()})\n'
+        self.logfile_obj.write(data)
+        self.logfile_obj.flush()
 
     def _get_banner(self):
         a = dic["mssql_banner"]
@@ -63,7 +70,7 @@ class mssqlProtocol(BaseProtocol):
             sstr += chr(self.begin_tds_login_packet[of + i * 2])
         self.username = sstr
 
-    def _get_passwdhash(self, of, len):
+    def _get_passwd(self, of, len):
         pws = ""
         mod = []
         for i in range(0, len):
@@ -81,7 +88,7 @@ class mssqlProtocol(BaseProtocol):
                 if passwd == sstr:
                     pws += j
                     break
-        self.passhash = pws
+        self.password = pws
 
     def _get_bytes_by_flag(self , data):
         begin = data

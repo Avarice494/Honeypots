@@ -32,7 +32,7 @@ class BaseProtocol(asyncio.Protocol):
     def _get_username(self, data, offset=0):
         return ''
 
-    def _get_passwdhash(self, data, offset=0):
+    def _get_passwd(self, data, offset=0):
         return ''
 
     def _get_response(self):
